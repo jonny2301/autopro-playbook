@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "openai": "^4.24.1",
+    "@anthropic-ai/sdk": "^0.15.0",
+    "@google/generative-ai": "^0.2.1",
+    "cohere-ai": "^7.7.0",
+    "replicate": "^0.22.0",
     "dotenv": "^16.3.1",
-    "axios": "^1.6.2"
+    "axios": "^1.6.2",
+    "node-cache": "^5.1.2"
   },
   "keywords": [
     "ai",
