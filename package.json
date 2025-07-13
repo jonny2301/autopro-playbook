@@ -1,0 +1,25 @@
+{
+  "name": "autopro-playbook",
+  "version": "1.0.0",
+  "description": "AI Automation Playbook with 2000+ templates and workflows",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "openai": "^4.24.1",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2"
+  },
+  "keywords": [
+    "ai",
+    "automation",
+    "openai",
+    "n8n",
+    "workflows"
+  ],
+  "author": "jonny2301",
+  "license": "MIT"
+}
