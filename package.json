@@ -6,6 +6,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
+    "24-7": "node 24-7-manager.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:logs": "pm2 logs",
+    "pm2:monit": "pm2 monit",
+    "health": "node -e \"const HealthMonitor = require('./health-monitor'); new HealthMonitor().getDetailedReport().then(r => console.log(JSON.stringify(r, null, 2)))\"",
+    "quota": "node -e \"const QuotaManager = require('./ai-quota-manager'); new QuotaManager().generateDailyReport()\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -16,7 +24,9 @@
     "replicate": "^0.22.0",
     "dotenv": "^16.3.1",
     "axios": "^1.6.2",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "pm2": "^5.3.0",
+    "winston": "^3.11.0"
   },
   "keywords": [
     "ai",

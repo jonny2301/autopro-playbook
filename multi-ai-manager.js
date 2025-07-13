@@ -51,6 +51,14 @@ class MultiAIManager {
                 auth: process.env.REPLICATE_API_TOKEN
             });
         }
+
+        // OpenRouter (supports many free models)
+        if (process.env.OPENROUTER_API_KEY) {
+            this.providers.openrouter = new OpenAI({
+                apiKey: process.env.OPENROUTER_API_KEY,
+                baseURL: 'https://openrouter.ai/api/v1'
+            });
+        }
     }
 
     setupFallbackOrder() {
@@ -134,6 +142,9 @@ class MultiAIManager {
                     break;
                 case 'replicate':
                     result = await this.callReplicate(prompt, config);
+                    break;
+                case 'openrouter':
+                    result = await this.callOpenRouter(prompt, config);
                     break;
                 default:
                     throw new Error(`Unknown provider: ${provider}`);
@@ -240,13 +251,34 @@ class MultiAIManager {
         };
     }
 
+    async callOpenRouter(prompt, config) {
+        const response = await this.providers.openrouter.chat.completions.create({
+            model: process.env.OPENROUTER_MODEL || 'microsoft/wizardlm-2-8x22b:free',
+            messages: [{ 
+                role: 'user', 
+                content: prompt 
+            }],
+            max_tokens: config.maxTokens,
+            temperature: config.temperature
+        });
+
+        return {
+            success: true,
+            response: response.choices[0].message.content,
+            provider: 'openrouter',
+            tokens: response.usage?.total_tokens || config.maxTokens,
+            estimatedCost: 0 // Free models
+        };
+    }
+
     estimateCost(provider, tokens) {
         const rates = {
             openai: 0.03 / 1000,      // $0.03 per 1K tokens (GPT-4)
             anthropic: 0.015 / 1000,  // $0.015 per 1K tokens (Claude)
             google: 0.00025 / 1000,   // $0.00025 per 1K tokens (Gemini)
             cohere: 0.02 / 1000,      // $0.02 per 1K tokens
-            replicate: 0.05 / 1000    // Varies by model
+            replicate: 0.05 / 1000,   // Varies by model
+            openrouter: 0             // Free models available
         };
 
         return (rates[provider] || 0.01) * tokens;
