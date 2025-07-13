@@ -1,0 +1,11 @@
+Workflow Name,Stage,Trigger Event,Core Function
+AI Lead Qualification Flow,Lead Entry,User starts session,Qualify and tag users
+Instant Payment Integration,Payment,User initiates payment,Process secure payment
+Dynamic Lead Scoring Loop,Lead Analysis,User answers form,Score leads for conversion potential
+Automated Follow-Up Sequence,Post-Sale,Lead unlocked,Send email + upsell
+Multi-Source Monetization Scanner,Backend Scan,Hourly cronjob,Find missed payments or dormant APIs
+GPT-Driven Problem Solver,Support,User stuck/question,Diagnose stuck moments + give insight
+Auto-Upsell Funnel Builder,Sales Expansion,Successful lead unlock,Build and show upsells
+Behavioral Analytics Trigger,Analytics,Lead preview interaction,Track patterns for optimization
+Revenue Recovery Protocol,Diagnostics,Revenue dip detected,Run repair + reconnect
+Crown Companion Sync,Integration,Agent request connection,Sync with Jonathan's mental model
