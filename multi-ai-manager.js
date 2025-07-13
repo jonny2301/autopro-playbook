@@ -5,12 +5,14 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { CohereClient } = require('cohere-ai');
 const Replicate = require('replicate');
 const NodeCache = require('node-cache');
+const AIQuotaManager = require('./ai-quota-manager');
 
 class MultiAIManager {
     constructor() {
         this.cache = new NodeCache({ stdTTL: 600 }); // 10 minute cache
         this.providers = {};
         this.costTracker = { monthly: 0, daily: 0 };
+        this.quotaManager = new AIQuotaManager();
         
         this.initializeProviders();
         this.setupFallbackOrder();
@@ -109,19 +111,42 @@ class MultiAIManager {
             temperature: options.temperature || parseFloat(process.env.TEMPERATURE) || 0.7
         };
 
-        switch (provider) {
-            case 'openai':
-                return await this.callOpenAI(prompt, config);
-            case 'anthropic':
-                return await this.callAnthropic(prompt, config);
-            case 'google':
-                return await this.callGoogle(prompt, config);
-            case 'cohere':
-                return await this.callCohere(prompt, config);
-            case 'replicate':
-                return await this.callReplicate(prompt, config);
-            default:
-                throw new Error(`Unknown provider: ${provider}`);
+        // Check quota before making request
+        const estimatedCost = this.estimateCost(provider, config.maxTokens);
+        if (!this.quotaManager.canMakeRequest(provider, config.maxTokens, estimatedCost)) {
+            throw new Error(`Daily quota exceeded for ${provider}`);
+        }
+
+        let result;
+        try {
+            switch (provider) {
+                case 'openai':
+                    result = await this.callOpenAI(prompt, config);
+                    break;
+                case 'anthropic':
+                    result = await this.callAnthropic(prompt, config);
+                    break;
+                case 'google':
+                    result = await this.callGoogle(prompt, config);
+                    break;
+                case 'cohere':
+                    result = await this.callCohere(prompt, config);
+                    break;
+                case 'replicate':
+                    result = await this.callReplicate(prompt, config);
+                    break;
+                default:
+                    throw new Error(`Unknown provider: ${provider}`);
+            }
+
+            // Record successful usage
+            this.quotaManager.recordUsage(provider, result.tokens, result.estimatedCost, true);
+            return result;
+
+        } catch (error) {
+            // Record failed attempt
+            this.quotaManager.recordUsage(provider, 0, 0, false);
+            throw error;
         }
     }
 
